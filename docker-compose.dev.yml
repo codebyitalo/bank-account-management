@@ -1,0 +1,32 @@
+services:
+  database:
+    container_name: database-bank-account-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+      POSTGRES_DB: ${POSTGRES_DATABASE_NAME}
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE_NAME}",
+        ]
+      interval: 45s
+      timeout: 10s
+      retries: 5
+    networks:
+      - database-network
+
+networks:
+  database-network:
+    driver: bridge
+
+volumes:
+  db:
